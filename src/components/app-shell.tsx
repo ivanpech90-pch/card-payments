@@ -6,6 +6,15 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { PinLockScreen } from "@/components/pin-lock-screen";
+import { useIdleLock } from "@/hooks/use-idle-lock";
+
+import {
+  isPinEnabled,
+  isUnlocked,
+  lockApp,
+} from "@/lib/security";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -17,14 +26,36 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [locked, setLocked] = useState(false);
+  useIdleLock(5 * 60 * 1000, () => {
+    if (!isPinEnabled()) return;
+  
+    lockApp();
+    setLocked(true);
+  });
+  useEffect(() => {
+    if (!isPinEnabled()) return;
+  
+    if (!isUnlocked()) {
+      setLocked(true);
+    }
+  }, []);
 
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
+    lockApp();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
 
+  if (locked) {
+    return (
+      <PinLockScreen
+        onSuccess={() => setLocked(false)}
+      />
+    );
+  }
   return (
     <div className="min-h-screen bg-background md:flex">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 md:flex">

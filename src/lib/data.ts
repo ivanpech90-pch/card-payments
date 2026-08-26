@@ -20,6 +20,7 @@ export type Payment = {
   card_id: string;
   paid_at: string;
   amount: number;
+  category: string | null;
   notes: string | null;
   receipt_path: string | null;
   created_at: string;

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { analyzeReceipt } from "@/lib/ocr.functions";
 import { todayISO } from "@/lib/format";
 import { uploadReceipt, useSavePayment, type CreditCard, type Payment } from "@/lib/data";
+import { CATEGORIES } from "@/lib/categories";
 
 type Props = {
   open: boolean;
@@ -19,12 +20,14 @@ type Props = {
   payment?: Payment | null;
 };
 
+
 export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
   const save = useSavePayment();
   const analyze = useServerFn(analyzeReceipt);
   const [cardId, setCardId] = useState("");
   const [paidAt, setPaidAt] = useState(todayISO());
   const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -34,6 +37,7 @@ export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
     setCardId(payment?.card_id ?? cards[0]?.id ?? "");
     setPaidAt(payment?.paid_at ?? todayISO());
     setAmount(payment ? String(payment.amount) : "");
+    setCategory(payment?.category ?? "");
     setNotes(payment?.notes ?? "");
     setFile(null);
   }, [open, payment, cards]);
@@ -88,6 +92,7 @@ export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
           card_id: cardId,
           paid_at: paidAt,
           amount: value,
+          category: category || null,
           notes: notes.trim().slice(0, 1000) || null,
           receipt_path,
         },
@@ -131,6 +136,29 @@ export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
               </Button>
             </div>
           </div>
+          <div className="space-y-1.5">
+  <Label>Categoría</Label>
+
+  <Select
+    value={category}
+    onValueChange={setCategory}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Selecciona una categoría" />
+    </SelectTrigger>
+
+    <SelectContent>
+      {CATEGORIES.map((item) => (
+        <SelectItem
+          key={item.value}
+          value={item.value}
+        >
+          {item.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
 
           <div className="space-y-1.5">
             <Label htmlFor="amount">Monto pagado</Label>
@@ -151,11 +179,33 @@ export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
           <div className="space-y-1.5">
             <Label htmlFor="receipt">Comprobante</Label>
             <Input
-              id="receipt"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
+  id="receipt"
+  type="file"
+  accept="image/*"
+  capture="environment"
+  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+/>
+{file && (
+  <div className="overflow-hidden rounded-lg border">
+    <img
+      src={URL.createObjectURL(file)}
+      alt="Comprobante"
+      className="max-h-64 w-full object-contain"
+    />
+  </div>
+)}
+
+{file && (
+  <Button
+    type="button"
+    variant="destructive"
+    size="sm"
+    onClick={() => setFile(null)}
+  >
+    Eliminar imagen
+  </Button>
+)}
+
             <Button type="button" variant="outline" className="w-full" onClick={runOcr} disabled={analyzing}>
               {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               Analizar comprobante

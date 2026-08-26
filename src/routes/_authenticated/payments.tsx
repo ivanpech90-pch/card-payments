@@ -20,6 +20,21 @@ import {
 } from "@/components/ui/alert-dialog";
 import { receiptUrl, useCards, useDeletePayment, usePayments, type Payment } from "@/lib/data";
 import { currency, shortDate } from "@/lib/format";
+import { categoryLabel } from "@/lib/categories";
+const CATEGORY_LABELS: Record<string, string> = {
+  food: "🍔 Comida",
+  groceries: "🛒 Despensa",
+  supermarket: "🏪 Supermercado",
+  fuel: "⛽ Gasolina",
+  utilities: "⚡ Servicios",
+  internet: "📶 Internet",
+  streaming: "📺 Streaming",
+  chatgpt: "🤖 ChatGPT",
+  gym: "🏋️ Gimnasio",
+  health: "🏥 Salud",
+  education: "📚 Educación",
+  other: "📦 Otro",
+};
 
 export const Route = createFileRoute("/_authenticated/payments")({
   head: () => ({
@@ -77,6 +92,7 @@ function PaymentsPage() {
     const data = rows.map((p) => ({
       Fecha: p.paid_at,
       Tarjeta: cardName(p.card_id),
+      Categoria: categoryLabel(p.category),
       Monto: Number(p.amount),
       Notas: p.notes ?? "",
     }));
@@ -165,22 +181,23 @@ function PaymentsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Fecha</TableHead>
-              <TableHead>Tarjeta</TableHead>
-              <TableHead className="text-right">Monto</TableHead>
-              <TableHead className="hidden md:table-cell">Notas</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+<TableHead>Tarjeta</TableHead>
+<TableHead>Categoría</TableHead>
+<TableHead className="text-right">Monto</TableHead>
+<TableHead className="hidden md:table-cell">Notas</TableHead>
+<TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell colSpan={6} className="text-center text-muted-foreground">
                   Cargando…
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell colSpan={6} className="text-center text-muted-foreground">
                   Sin pagos registrados.
                 </TableCell>
               </TableRow>
@@ -189,6 +206,11 @@ function PaymentsPage() {
                 <TableRow key={p.id}>
                   <TableCell>{shortDate(p.paid_at)}</TableCell>
                   <TableCell>{cardName(p.card_id)}</TableCell>
+                  <TableCell>
+  {p.category
+    ? CATEGORY_LABELS[p.category] ?? p.category
+    : "—"}
+</TableCell>
                   <TableCell className="text-right font-medium">{currency(Number(p.amount))}</TableCell>
                   <TableCell className="hidden max-w-[240px] truncate md:table-cell">{p.notes}</TableCell>
                   <TableCell>
