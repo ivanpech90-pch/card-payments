@@ -106,11 +106,27 @@ export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+      <DialogContent
+  className="
+    h-[100dvh]
+    max-h-[100dvh]
+    w-full
+    max-w-none
+    rounded-none
+    overflow-y-auto
+    sm:h-auto
+    sm:max-h-[90vh]
+    sm:max-w-md
+    sm:rounded-lg
+  "
+>
         <DialogHeader>
           <DialogTitle>{payment ? "Editar pago" : "Registrar pago"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
+        <form
+  onSubmit={submit}
+  className="space-y-5 pb-24"
+>
           <div className="space-y-1.5">
             <Label>Tarjeta</Label>
             <Select value={cardId} onValueChange={setCardId}>
@@ -212,9 +228,14 @@ export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
             </Button>
           </div>
 
-          <Button type="submit" className="w-full" disabled={save.isPending}>
-            Guardar
-          </Button>
+          <div className="sticky bottom-0 bg-background pt-3">
+  <Button
+    type="submit"
+    className="h-12 w-full text-base font-semibold"
+  >
+    Guardar pago
+  </Button>
+</div>
         </form>
       </DialogContent>
     </Dialog>

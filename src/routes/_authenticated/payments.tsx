@@ -126,19 +126,38 @@ function PaymentsPage() {
     <AppShell
       title="Pagos"
       actions={
-        <Button
-          size="sm"
-          onClick={() => {
-            setEditing(null);
-            setOpen(true);
-          }}
-          disabled={cards.length === 0}
-        >
-          <Plus className="h-4 w-4" /> Nuevo
-        </Button>
+        <>
+          {/* Desktop */}
+          <Button
+            className="hidden md:flex"
+            onClick={() => setOpen(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Nuevo pago
+          </Button>
+      
+          {/* Mobile FAB */}
+          <Button
+            size="icon"
+            className="
+              fixed
+              bottom-20
+              right-5
+              h-16
+              w-16
+              rounded-full
+              shadow-2xl
+              z-50
+              md:hidden
+            "
+            onClick={() => setOpen(true)}
+          >
+            <Plus className="h-7 w-7" />
+          </Button>
+        </>
       }
     >
-      <div className="surface grid gap-3 rounded-xl p-4 md:grid-cols-4">
+    <div className="surface space-y-3 rounded-xl p-4 md:grid md:grid-cols-4 md:gap-3">
         <div className="relative md:col-span-2">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input className="pl-9" placeholder="Buscar por tarjeta, nota o monto" value={query} onChange={(e) => setQuery(e.target.value)} />
@@ -156,7 +175,7 @@ function PaymentsPage() {
             ))}
           </SelectContent>
         </Select>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="Desde" />
           <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="Hasta" />
         </div>
@@ -176,8 +195,8 @@ function PaymentsPage() {
         </div>
       </div>
 
-      <div className="surface overflow-x-auto rounded-xl">
-        <Table>
+      <div className="hidden md:block surface overflow-x-auto rounded-xl">
+  <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Fecha</TableHead>
@@ -242,6 +261,76 @@ function PaymentsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <div className="space-y-3 md:hidden">
+  {rows.map((p) => (
+    <div
+      key={p.id}
+      className="surface rounded-xl p-4"
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-medium">
+            {cardName(p.card_id)}
+          </p>
+
+          <p className="text-sm text-muted-foreground">
+            {shortDate(p.paid_at)}
+          </p>
+        </div>
+
+        <p className="text-lg font-semibold">
+          {currency(Number(p.amount))}
+        </p>
+      </div>
+
+      <div className="mt-3">
+        <span className="text-sm">
+          {p.category
+            ? CATEGORY_LABELS[p.category] ?? p.category
+            : "—"}
+        </span>
+      </div>
+
+      {p.notes && (
+        <p className="mt-2 text-sm text-muted-foreground">
+          {p.notes}
+        </p>
+      )}
+
+      <div className="mt-4 flex justify-end gap-2">
+        {p.receipt_path && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => openReceipt(p.receipt_path!)}
+          >
+            Ver
+          </Button>
+        )}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setEditing(p);
+            setOpen(true);
+          }}
+        >
+          Editar
+        </Button>
+
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => setDeleting(p)}
+        >
+          Eliminar
+        </Button>
+      </div>
+    </div>
+  ))}
+</div>
 
       <PaymentDialog open={open} onOpenChange={setOpen} cards={cards} payment={editing} />
 
