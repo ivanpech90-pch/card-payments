@@ -29,7 +29,7 @@ export function AppShell({ title, actions, children }: { title: string; actions?
   const [locked, setLocked] = useState(false);
   useIdleLock(5 * 60 * 1000, () => {
     if (!isPinEnabled()) return;
-  
+
     lockApp();
     setLocked(true);
   });
@@ -87,16 +87,16 @@ export function AppShell({ title, actions, children }: { title: string; actions?
 
       <div className="flex min-w-0 flex-1 flex-col pb-20 md:pb-0">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-background/80 px-4 py-3 backdrop-blur md:px-8">
-          <h1 className="truncate text-xl font-semibold">{title}</h1>
-          <div className="flex items-center gap-2">
-            {actions}
-            <ThemeToggle />
+           <h1 className="truncate text-xl font-semibold">{title}</h1>
+           <div className="flex items-center gap-2">
+             {actions}
+             <ThemeToggle />
             <Button variant="ghost" size="icon" className="md:hidden" onClick={signOut} aria-label="Salir">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </header>
-        <main className="fade-up flex-1 space-y-6 p-4 md:p-8">{children}</main>
+        <main className="flex-1 space-y-6 p-4 md:p-8">{children}</main>
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-border bg-background/95 backdrop-blur md:hidden">

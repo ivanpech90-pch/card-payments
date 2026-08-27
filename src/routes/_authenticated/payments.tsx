@@ -126,37 +126,20 @@ function PaymentsPage() {
     <AppShell
       title="Pagos"
       actions={
-        <>
-          {/* Desktop */}
-          <Button
-            className="hidden md:flex"
-            onClick={() => setOpen(true)}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo pago
-          </Button>
-      
-          {/* Mobile FAB */}
-          <Button
-  size="icon"
-  className="
-    fixed
-    bottom-20
-    right-4
-    h-16
-    w-16
-    rounded-full
-    shadow-xl
-    z-[100]
-    md:bottom-6
-  "
-            onClick={() => setOpen(true)}
-          >
-            <Plus className="h-7 w-7" />
-          </Button>
-        </>
+        <Button className="hidden md:flex" onClick={() => setOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Nuevo pago
+        </Button>
       }
     >
+      <Button
+        size="icon"
+        className="fixed bottom-20 right-4 z-50 h-14 w-14 rounded-full shadow-xl md:hidden"
+        onClick={() => setOpen(true)}
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
+
     <div className="surface space-y-3 rounded-xl p-4 md:grid md:grid-cols-4 md:gap-3">
         <div className="relative md:col-span-2">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
