@@ -138,18 +138,18 @@ function PaymentsPage() {
       
           {/* Mobile FAB */}
           <Button
-            size="icon"
-            className="
-              fixed
-              bottom-20
-              right-5
-              h-16
-              w-16
-              rounded-full
-              shadow-2xl
-              z-50
-              md:hidden
-            "
+  size="icon"
+  className="
+    fixed
+    bottom-20
+    right-4
+    h-16
+    w-16
+    rounded-full
+    shadow-xl
+    z-[100]
+    md:bottom-6
+  "
             onClick={() => setOpen(true)}
           >
             <Plus className="h-7 w-7" />
