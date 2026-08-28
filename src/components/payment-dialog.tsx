@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { analyzeReceipt } from "@/lib/ocr.functions";
+import { extractReceiptData } from "@/lib/ocr";
 import { todayISO } from "@/lib/format";
 import { uploadReceipt, useSavePayment, type CreditCard, type Payment } from "@/lib/data";
 import { CATEGORIES } from "@/lib/categories";
@@ -23,7 +22,6 @@ type Props = {
 
 export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
   const save = useSavePayment();
-  const analyze = useServerFn(analyzeReceipt);
   const [cardId, setCardId] = useState("");
   const [paidAt, setPaidAt] = useState(todayISO());
   const [amount, setAmount] = useState("");
@@ -49,21 +47,13 @@ export function PaymentDialog({ open, onOpenChange, cards, payment }: Props) {
     }
     setAnalyzing(true);
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
-        reader.readAsDataURL(file);
-      });
-      const result = await analyze({ data: { imageDataUrl: dataUrl } });
-      if (result.error) {
-        toast.error(result.error);
-      } else if (result.amount == null && result.date == null) {
-        toast.info("No se detectaron datos, captura manualmente");
-      } else {
-        if (result.amount != null) setAmount(String(result.amount));
-        if (result.date) setPaidAt(result.date);
+      const result = await extractReceiptData(file);
+      if (result.amount != null) setAmount(String(result.amount));
+      if (result.date) setPaidAt(result.date);
+      if (result.amount != null || result.date) {
         toast.success("Comprobante analizado");
+      } else {
+        toast.info("No se detectaron datos");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo analizar");
