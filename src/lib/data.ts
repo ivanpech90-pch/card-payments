@@ -101,7 +101,12 @@ export async function uploadReceipt(file: File) {
 
   const user_id = await currentUserId();
   const ext = file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1] ?? "jpg";
-  const path = `${user_id}/${crypto.randomUUID()}.${ext}`;
+  const fileId =
+  typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+const path = `${user_id}/${fileId}.${ext}`;
   const { error } = await supabase.storage.from("receipts").upload(path, file);
   if (error) throw error;
   return path;
