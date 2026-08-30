@@ -95,8 +95,8 @@ export function useDeleteCard() {
 }
 
 export async function uploadReceipt(file: File) {
-  const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic"]);
-  if (!allowedTypes.has(file.type)) throw new Error("El comprobante debe ser una imagen JPG, PNG, WebP o HEIC");
+  const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "application/pdf"]);
+  if (!allowedTypes.has(file.type)) throw new Error("El comprobante debe ser una imagen JPG, PNG, WebP, HEIC o PDF");
   if (file.size > 8 * 1024 * 1024) throw new Error("El comprobante no puede superar 8 MB");
 
   const user_id = await currentUserId();

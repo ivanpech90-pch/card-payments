@@ -286,9 +286,10 @@ function PaymentsPage() {
           <Button
             variant="outline"
             size="sm"
+            className="h-10 px-4"
             onClick={() => openReceipt(p.receipt_path!)}
           >
-            Ver
+            Visualizar
           </Button>
         )}
 
